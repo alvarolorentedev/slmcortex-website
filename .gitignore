@@ -1,0 +1,5 @@
+node_modules/
+.docusaurus/
+build/
+.superpowers/
+.DS_Store
