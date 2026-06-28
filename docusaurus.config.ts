@@ -3,7 +3,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'SLMCortex',
-  tagline: 'Frontier-feeling local coding workflows',
+  tagline: 'Composable local SLM engine for focused coding workflows',
   favicon: 'img/favicon.ico',
   url: 'https://slmcortex.dev',
   baseUrl: '/',
