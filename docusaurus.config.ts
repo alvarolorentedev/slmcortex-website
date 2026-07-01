@@ -50,8 +50,9 @@ const config: Config = {
           title: 'Docs',
           items: [
             {label: 'Quickstart', to: '/docs/getting-started/quickstart'},
+            {label: 'Packaged Install', to: '/docs/getting-started/packaged-install'},
             {label: 'Command Reference', to: '/docs/reference/command-reference'},
-            {label: 'Architecture', to: '/docs/architecture/slm-factory'},
+            {label: 'How It Works', to: '/docs/architecture/slm-factory'},
           ],
         },
         {

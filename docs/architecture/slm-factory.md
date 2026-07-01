@@ -1,31 +1,47 @@
 ---
-title: SLM Factory
+title: Slm Factory
 ---
 
-SLM Factory is the packaging boundary for SLMCortex v0.1.
+Slm Factory is the packaging boundary in SLMCortex.
 
-It turns an existing adapter directory plus provenance into a self-describing
-SLM package without retraining a model or mutating checked-in research
-artifacts.
+Its job is simple: take an existing adapter plus its provenance and turn it
+into a reusable SLM package that the rest of the system can trust.
 
-## Responsibilities
+## What It Does
 
-- package an existing adapter into a deterministic SLM artifact
-- optionally run the product `train-slm` wrapper for built-in research SLMs
-- record provenance, checksums, protected input snapshots, and composition metadata
-- validate emitted package files for internal consistency
+- packages an existing adapter into a deterministic SLM artifact
+- records provenance, checksums, protected inputs, and composition metadata
+- optionally runs the product `train-slm` wrapper when you want training plus packaging
+- validates that the emitted package is internally consistent
 
-## Inputs
+## What Goes In
 
-- adapter directory with `adapters.safetensors` or `adapter.gguf`
+- an adapter directory
 - train and eval dataset paths for provenance
-- eval summary JSON
+- an eval summary
 - optional examples and composition metadata
 
-## Outputs
+## What Comes Out
 
-One package directory containing `slm.yaml`, `metadata.json`,
-`training_config.json`, `eval.json`, `README.md`, and `adapter/`.
+One SLM package directory containing:
 
-SLM Factory owns the `package-slm` and product `train-slm` stages of the demo
-flow.
+- `slm.yaml`
+- `metadata.json`
+- `training_config.json`
+- `eval.json`
+- `README.md`
+- `adapter/`
+
+## Why It Matters
+
+Factory is where a loose adapter becomes a portable capability.
+
+Without this step, the rest of the system has no stable contract for routing,
+validation, or composition.
+
+## Where It Sits In The Flow
+
+`package-slm` and `train-slm` live here.
+
+The next layer is [Slm Composer](slm-composer.md), which combines validated
+packages into a runtime bundle.

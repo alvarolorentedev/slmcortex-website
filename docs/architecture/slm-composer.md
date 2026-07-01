@@ -1,31 +1,48 @@
 ---
-title: SLM Composer
+title: Slm Composer
 ---
 
-SLM Composer is the deterministic assembly layer.
+Slm Composer is the assembly layer.
 
-It loads validated SLM packages, checks compatibility, derives routes from
-package metadata, and writes a runtime bundle that Runtime Core can consume
-directly.
+It takes validated SLM packages, checks whether they can coexist, derives
+routes from their metadata, and writes one runtime bundle that Runtime Core can
+load directly.
 
-## Responsibilities
+## What It Does
 
-- validate that selected packages can coexist
-- derive task and semantic-family routes
-- emit stable manifests, reports, and checksums
-- keep registry enrichment optional and non-authoritative
+- validates that selected packages can coexist
+- derives task and semantic-family routes from package metadata
+- writes stable manifests, reports, and checksums
+- keeps source packages immutable during composition
 
-## Inputs
+## What Goes In
 
 - one or more validated SLM packages
-- optional registry enrichment file
-- composition strategy, currently `routed`
+- optional registry enrichment
+- a composition strategy, currently `routed`
 
-## Outputs
+## What Comes Out
 
-One runtime bundle containing `composition.yaml`, `router_config.json`,
-`active_slms.json`, `compatibility_report.json`, `budget_report.json`,
-`checksums.json`, and `README.md`.
+One runtime bundle containing:
 
-In v0.1, source packages and checked-in artifacts are never mutated during
-composition.
+- `composition.yaml`
+- `router_config.json`
+- `active_slms.json`
+- `compatibility_report.json`
+- `budget_report.json`
+- `checksums.json`
+- `README.md`
+
+## Why It Matters
+
+Composer is the bridge between "I have some packaged capabilities" and
+"I have a runtime I can actually validate and run."
+
+That runtime bundle is the unit of deployment.
+
+## Where It Sits In The Flow
+
+`compose-slms` and `compose-folder` route through this layer.
+
+The next layer is [Runtime Core](runtime-core.md), which validates and uses the
+bundle at execution time.

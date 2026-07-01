@@ -2,48 +2,160 @@
 title: Command Reference
 ---
 
-Use `slmcortex` or `python -m slmcortex`. Prefer `--dry-run` when you only want
-to inspect routing, composition, serving startup, or agent behavior.
+This page covers the public CLI surface in one place.
 
-## Common conventions
+Use `slmcortex` or `python -m slmcortex`.
 
-- `generate-dataset`, `train-slm`, `package-slm`, and `compose-slms` are the packaging pipeline.
-- `route`, `compose-from-route`, `infer`, `serve`, and `agent run` are the runtime pipeline.
-- `infer` and `agent run` require exactly one of `--runtime` or `--slms-dir`.
-- Backend selection comes from base config: `backend: auto | mlx | gguf`.
-- `auto` resolves to MLX only on macOS Apple Silicon and GGUF elsewhere.
-- GGUF requires a `.gguf` runtime model path. MLX is rejected outside macOS arm64/aarch64.
+On macOS and Linux, the expected first install path is the Homebrew tap:
+[`alvarolorentedev/homebrew-SLMCortex`](https://github.com/alvarolorentedev/homebrew-SLMCortex).
 
-## Commands at a glance
+## Start With These Commands
 
-| Command | Best for |
+If you are new to the project, learn these first:
+
+| Command | What it is for |
 | --- | --- |
-| `generate-dataset` | deterministic train/eval JSONL datasets |
-| `validate-dataset` | schema and leakage checks |
-| `train-slm` | turning datasets into a packaged SLM |
-| `train-plasticity-lora` | on-demand local adapter training |
-| `import-lora` | wrapping an external LoRA |
-| `package-slm` | converting an existing adapter into a package |
-| `validate-slm-package` | verifying package integrity |
-| `compose-slms` | building a deterministic runtime bundle |
-| `route` | inspecting which SLMs match a task |
-| `compose-from-route` | routing plus one-shot runtime composition |
-| `validate-runtime` | checking a bundle before use |
-| `infer` | model-backed or dry-run inference |
-| `serve` | OpenAI-compatible local API |
-| `agent run` | bounded repo work on a local checkout |
+| `slmcortex doctor` | check install health, workspace paths, and backend visibility |
+| `slmcortex compose-folder` | scan one folder, pick packages, compose a runtime, and optionally export it |
+| `slmcortex infer --dry-run` | inspect routing without loading a real model |
+| `slmcortex serve` | expose the local compatibility server |
+| `slmcortex agent run` | run bounded repository work against a local checkout |
 
-## Packaging pipeline
+## Product Paths
+
+There are two practical ways to think about the CLI:
+
+- **Composer-first product path:** `doctor`, `compose-folder`, `infer`, `serve`, `agent run`
+- **Factory/package path:** `generate-dataset`, `validate-dataset`, `train-slm`, `package-slm`, `compose-slms`
+
+The Composer-first path is what most visitors should start with.
+
+## Common Conventions
+
+- Prefer `--dry-run` when you only want to inspect routing or control flow.
+- `infer` requires exactly one of `--runtime` or `--slms-dir`.
+- `agent run` requires exactly one of `--runtime` or `--slms-dir` unless project defaults exist.
+- `backend: auto` resolves to MLX on macOS Apple Silicon and GGUF elsewhere.
+- GGUF requires a `.gguf` runtime model path.
+
+## Composer-First Commands
+
+### `doctor`
+
+Check packaged-product readiness and workspace health.
+
+```bash
+slmcortex doctor
+slmcortex doctor --workspace /tmp/slmcortex-app
+slmcortex doctor --export-support-bundle
+```
+
+### `compose-folder`
+
+Compose a runtime from one local folder and the external app workspace.
+
+```bash
+slmcortex compose-folder \
+  --workspace /tmp/slmcortex-app \
+  --folder /path/to/repo \
+  --task "Create a FastAPI endpoint with request validation" \
+  --export-descriptor /tmp/slmcortex-app/exports/repo.json
+```
+
+### `init`
+
+Create project-local SLMCortex state for the project-owned LoRA flow.
+
+```bash
+slmcortex init
+```
+
+### `loras download`
+
+Download a selected project-owned LoRA into the local SLM directory.
+
+```bash
+slmcortex loras download fastapi
+slmcortex loras download hf://owner/repo --as fastapi
+```
+
+### `infer`
+
+Run local inference or inspect routing with `--dry-run`.
+
+```bash
+slmcortex infer \
+  --runtime /tmp/slmcortex-demo/runtime \
+  --prompt "Fix this Python traceback" \
+  --dry-run
+```
+
+Or use an SLM directory directly:
+
+```bash
+slmcortex infer \
+  --slms-dir .slmcortex/prototype-slms \
+  --prompt "Fix a FastAPI validation bug" \
+  --allow-remote-loras \
+  --dry-run
+```
+
+### `serve`
+
+Expose the local OpenAI-compatible compatibility server.
+
+```bash
+slmcortex serve --runtime /tmp/slmcortex-demo/runtime
+```
+
+Or use the adaptive path:
+
+```bash
+slmcortex serve \
+  --slms-dir .slmcortex/prototype-slms \
+  --allow-remote-loras \
+  --dry-run
+```
+
+### `agent run`
+
+Run bounded local repository work.
+
+```bash
+slmcortex agent run \
+  --runtime /tmp/slmcortex-demo/runtime \
+  --repo /path/to/local/repo \
+  --task "Fix the failing answer implementation." \
+  --dry-run
+```
+
+## Factory And Package Commands
+
+### `generate-dataset`
+
+Generate deterministic train and eval JSONL datasets.
 
 ```bash
 slmcortex generate-dataset \
   --slm-id fastapi_contract \
   --domain fastapi \
   --report-output /tmp/fastapi_contract-report.json
+```
 
+### `validate-dataset`
+
+Validate one dataset and optionally check leakage against eval data.
+
+```bash
 slmcortex validate-dataset datasets/fastapi_contract/train.jsonl \
   --eval-dataset datasets/fastapi_contract/eval.jsonl
+```
 
+### `train-slm`
+
+Train a LoRA SLM from datasets and package it as a Slm Cortex artifact.
+
+```bash
 slmcortex train-slm \
   --slm-id fastapi_contract \
   --name "FastAPI Contract Slm" \
@@ -52,11 +164,9 @@ slmcortex train-slm \
   --output slms/fastapi_contract
 ```
 
-`train-slm` validates datasets before training and fails early on malformed or
-leaky data. MLX training writes `adapter/adapters.safetensors`; GGUF training
-writes `adapter/adapter.gguf` after PEFT training and llama.cpp conversion.
+### `package-slm`
 
-Package an existing adapter:
+Wrap an existing adapter as an SLM package.
 
 ```bash
 slmcortex package-slm \
@@ -69,34 +179,35 @@ slmcortex package-slm \
   --output /tmp/slmcortex-demo/python_slm
 ```
 
-Import a Hugging Face LoRA:
+### `validate-slm-package`
+
+Verify package structure, checksums, and protected inputs.
 
 ```bash
-slmcortex import-lora \
-  --source hf://owner/repo \
-  --slm-id fastapi_slm \
-  --name "FastAPI Slm" \
-  --output slms/fastapi_slm \
-  --train-dataset data/train.jsonl \
-  --eval-dataset data/eval.jsonl
+slmcortex validate-slm-package --path slms/python_slm
 ```
 
-## Runtime pipeline
+### `compose-slms`
+
+Compose validated packages into one deterministic runtime bundle.
 
 ```bash
 slmcortex compose-slms \
   --slms /tmp/slmcortex-demo/python_slm,/tmp/slmcortex-demo/debugging_slm \
   --output /tmp/slmcortex-demo/runtime
-
-slmcortex validate-runtime --runtime /tmp/slmcortex-demo/runtime
-
-slmcortex infer \
-  --runtime /tmp/slmcortex-demo/runtime \
-  --prompt "Fix this Python traceback" \
-  --dry-run
 ```
 
-Route without composing:
+### `validate-runtime`
+
+Check a runtime bundle before inference or serving.
+
+```bash
+slmcortex validate-runtime --runtime /tmp/slmcortex-demo/runtime
+```
+
+### `route`
+
+Inspect which packages match a task without loading adapters.
 
 ```bash
 slmcortex route \
@@ -106,34 +217,8 @@ slmcortex route \
   --explain
 ```
 
-Route and compose in one step:
+## What To Read Next
 
-```bash
-slmcortex compose-from-route \
-  --slms-dir slms \
-  --repo . \
-  --task "Create a FastAPI endpoint" \
-  --runtime-out runtime/generated
-```
-
-## Serving
-
-```bash
-slmcortex serve --runtime /tmp/slmcortex-demo/runtime --host 127.0.0.1 --port 8000
-```
-
-Use `--dry-run` to validate serving configuration without starting the server.
-The compatibility server is minimal and non-streaming.
-
-## Agent run
-
-```bash
-slmcortex agent run \
-  --runtime /tmp/slmcortex-demo/runtime \
-  --repo /tmp/slmcortex-demo/toy-repo \
-  --task "Fix the failing answer implementation." \
-  --dry-run
-```
-
-`--slms-dir` mode only supports `--dry-run` or `--write-mode confirm`. Use
-`--trace-out` to write the run trace JSON.
+- [Quickstart](../getting-started/quickstart.md)
+- [Packaged Install](../getting-started/packaged-install.md)
+- [Local Coding Agent Setup](../getting-started/local-coding-agent-setup.md)

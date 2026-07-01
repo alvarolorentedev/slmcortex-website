@@ -4,29 +4,40 @@ title: Agent Runtime
 
 Agent Runtime is the bounded local task runner layered on top of Runtime Core.
 
-It inspects a repository, asks Runtime Core for a plan and patch proposal,
-optionally materializes a file replacement, and can run one developer-supplied
-validation command.
+It inspects a repository, asks Runtime Core for routing and patch guidance,
+optionally writes changes, and can run one developer-supplied validation
+command.
 
-## Responsibilities
+## What It Does
 
-- inspect a local repository with a small tool surface
-- request step-wise routing decisions from Runtime Core
-- capture traces of selected SLMs, proposed changes, and validation results
-- keep writes scoped to the repository root and controlled by `--writes`
+- inspects a local repository with a small tool surface
+- requests step-wise routing decisions from Runtime Core
+- captures traces of selected SLMs, proposed changes, and validation results
+- keeps writes scoped to the repository root and controlled by flags
 
-## Inputs
+## What Goes In
 
-- runtime bundle path
-- local repository path
-- task description
-- optional validation command and trace output path
+- a runtime bundle or `--slms-dir`
+- a local repository path
+- a task description
+- optional validation and trace options
 
-## Outputs
+## What Comes Out
 
-- one JSON result describing the agent run
-- optional trace file with routing and tool activity
-- optional repository file replacement when writes are enabled
+- one JSON result describing the run
+- an optional trace file
+- optional repository changes when writes are enabled
 
-The no-model demo uses `--dry-run` so developers can inspect the end-to-end
-agent flow without model downloads.
+## Why It Matters
+
+This is the part most visitors care about: can the same local runtime actually
+do bounded coding work on a repository?
+
+The answer in v0.1 is yes, but narrowly.
+
+## Current Boundaries
+
+- local, single-run execution only
+- bounded tool loop, not a full IDE agent
+- no background orchestration or long-lived memory
+- dry-run validates control flow, not model quality

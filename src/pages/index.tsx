@@ -18,73 +18,77 @@ type CompareItem = {
 
 const workflow: Item[] = [
   {
-    title: 'Package a small brain',
-    text: 'Wrap a focused LoRA adapter with provenance, protected inputs, evaluation data, fingerprints, and routing metadata.',
+    title: 'Package one capability',
+    text: 'Wrap a focused LoRA adapter as a reusable SLM package with provenance, checksums, and routing metadata.',
   },
   {
-    title: 'Compose the engine',
-    text: 'Combine validated SLM packages into an extensible runtime bundle without mutating the source assets.',
+    title: 'Compose one runtime',
+    text: 'Combine validated SLM packages into a deterministic runtime bundle without mutating the source packages.',
   },
   {
-    title: 'Validate before running',
+    title: 'Validate before trust',
     text: 'Check package and runtime structure before inference, serving, or agent behavior touches a local repository.',
   },
   {
-    title: 'Serve locally',
-    text: 'Use the same Runtime Core for dry-run routing, model-backed inference, a compatibility server, and bounded agent runs.',
+    title: 'Run the same core everywhere',
+    text: 'Use Runtime Core for dry-run routing, local inference, the compatibility server, and bounded agent runs.',
   },
 ];
 
 const comparisons: CompareItem[] = [
   {
     problem: 'Paid LLM services can turn every coding workflow into a metered remote dependency.',
-    approach: 'SLMCortex keeps focused SLM capabilities local, packaged, and inspectable before they run.',
+    approach: 'SLMCortex keeps focused coding capabilities local, packaged, and inspectable before they run.',
   },
   {
-    problem: 'One large general model is often used where a smaller, focused capability would be enough.',
-    approach: 'Compose small brains into a runtime bundle and extend the engine one capability at a time.',
+    problem: 'One large general model is often asked to do jobs that are narrow, repetitive, and expensive to validate.',
+    approach: 'SLMCortex packages smaller task-shaped capabilities and composes them into one runtime bundle.',
   },
   {
-    problem: 'Hosted API bills can climb before the workflow is even proven reliable.',
-    approach: 'Start with dry-run validation, then move to local inference when your backend and model setup are ready.',
+    problem: 'Tooling teams often need proof that routing and control flow work before they take on real backend complexity.',
+    approach: 'Start with dry-run validation, then move to local inference only when your backend and model setup are ready.',
   },
 ];
 
 const proof: Item[] = [
   {
-    title: 'Python 3.11+',
-    text: 'The documented setup starts from a standard virtual environment and editable install.',
+    title: 'Homebrew install',
+    text: 'macOS and Linux users can start with the Homebrew tap instead of cloning the source repo first.',
   },
   {
     title: 'No-model demo',
-    text: 'Packages checked-in adapters, composes a runtime, validates it, and runs dry-run inference and agent flow.',
+    text: 'Checks package, compose, validate, infer, and agent flow without downloading weights.',
+  },
+  {
+    title: 'Composer-first path',
+    text: 'Use doctor and compose-folder when you want the product-style install and folder-to-runtime flow.',
   },
   {
     title: 'Backend choices',
     text: 'MLX is used on Apple Silicon; GGUF covers Linux, Windows, macOS Intel, and explicit GGUF use.',
   },
   {
-    title: 'Minimal server',
-    text: 'A non-streaming OpenAI-compatible compatibility server is available for local runtime experiments.',
-  },
-  {
     title: 'Bounded agent',
-    text: 'The v0.1 agent is local and single-run, with writes controlled by flags rather than hidden background behavior.',
+    text: 'The current agent is local and single-run, with writes controlled by flags rather than hidden background behavior.',
   },
 ];
 
 const docs: Item[] = [
   {
     title: 'Quickstart',
-    text: 'Install SLMCortex and run the fastest no-model validation path.',
+    text: 'Start with the smallest end-to-end path and verify the runtime on your machine.',
+  },
+  {
+    title: 'Packaged Install',
+    text: 'Use the Composer-first install flow with doctor, compose-folder, and the external workspace contract.',
   },
   {
     title: 'Command Reference',
-    text: 'See the packaging, routing, runtime, serving, and agent commands.',
+    text: 'See the public CLI surface for packaging, composition, inference, serving, and agent work.',
   },
   {
     title: 'Architecture',
-    text: 'Understand Factory, Composer, Runtime Core, and Agent Runtime.',
+    text: 'Understand Factory, Composer, Runtime Core, and Agent Runtime without reading the source first.',
   },
 ];
 
@@ -92,7 +96,7 @@ const boundaries = [
   'Local, single-run execution only.',
   'Bounded tool loop, not a full IDE agent.',
   'Real inference requires local backend and model setup.',
-  'No benchmark, model-quality, or production-readiness claims.',
+  'The compatibility server is intentionally minimal and non-streaming.',
 ];
 
 function Section({
@@ -109,49 +113,46 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="Local SLM engine for focused coding workflows"
-      description="SLMCortex is a composable local SLM engine for focused, extensible coding capabilities without hosted LLM service bills.">
+      description="SLMCortex packages focused LoRA capabilities, composes them into local runtimes, validates them before use, and runs bounded coding workflows on top.">
       <main>
         <header className={styles.hero}>
           <div className={styles.heroInner}>
             <div className={styles.heroCopy}>
-              <h1>The local SLM engine alternative to LLM service handlers.</h1>
+              <h1>Package focused coding capabilities. Compose a local runtime. Validate before trust.</h1>
               <p>
-                SLMCortex lets you compose focused small brains into an extensible local
-                runtime, validate them before execution, and avoid turning every coding
-                workflow into a hosted LLM bill.
+                SLMCortex turns LoRA adapters into reusable SLM packages, composes
+                them into a deterministic runtime bundle, and uses the same runtime
+                for dry-run validation, local inference, a compatibility server, and
+                bounded repository work.
               </p>
               <div className={styles.actions}>
                 <Link className={styles.primaryAction} to="/docs/getting-started/quickstart">
-                  Run the no-model demo
+                  Start with quickstart
                 </Link>
                 <Link className={styles.secondaryAction} href={githubUrl}>
                   View on GitHub
                 </Link>
-                <Link className={styles.textAction} to="/docs/architecture/slm-factory">
-                  Read the architecture
+                <Link className={styles.textAction} to="/docs/getting-started/packaged-install">
+                  See packaged install
                 </Link>
               </div>
             </div>
 
             <div className={styles.heroPanel} aria-label="SLMCortex product flow">
               <div className={styles.panelHeader}>
-                <span>slmcortex demo</span>
+                <span>public path</span>
                 <strong>dry run first</strong>
               </div>
-              <pre>{`$ python scripts/run_slmcortex_demo.py
+              <pre>{`$ python -m slmcortex doctor
+$ brew install alvarolorentedev/SLMCortex/slmcortex
+$ slmcortex doctor
 
-package python_slm
-package debugging_slm
-compose runtime/
-validate-runtime runtime/
-infer --dry-run
-agent run --dry-run
+inspect workspace
+check backends
+compose-folder --help
 
-outputs:
-  python_slm/
-  debugging_slm/
-  runtime/
-  agent-trace.json`}</pre>
+source checkout fallback:
+  python scripts/run_slmcortex_demo.py`}</pre>
             </div>
           </div>
         </header>
@@ -159,8 +160,8 @@ outputs:
         <Section className={styles.intro}>
           <div className={styles.statement}>
             <strong>The package is the unit of distribution.</strong>
-            <strong>The engine is composed from focused SLMs.</strong>
-            <strong>The runtime stays local and inspectable.</strong>
+            <strong>The runtime bundle is the unit of deployment.</strong>
+            <strong>The runtime is the unit of execution.</strong>
           </div>
         </Section>
 
@@ -168,9 +169,8 @@ outputs:
           <div className={styles.sectionHeader}>
             <h2>One explicit path from small brain to local engine</h2>
             <p>
-              The landing path mirrors the actual product path in the source repo: package
-              focused capabilities, compose a runtime bundle, validate it, then serve
-              local inference or run the bounded agent workflow.
+              Visitors should be able to understand the product without reading the
+              source. The core flow is package, compose, validate, then run.
             </p>
           </div>
           <div className={styles.workflow}>
@@ -186,11 +186,11 @@ outputs:
 
         <Section className={styles.compareBand}>
           <div className={styles.sectionHeader}>
-            <h2>Why this beats another hosted handler</h2>
+            <h2>Why teams reach for this instead of another hosted handler</h2>
             <p>
-              The point is not to claim better models. The point is to make local coding
-              capabilities cheaper to evaluate, easier to inspect, and reliable enough to
-              run through bounded control flow.
+              The pitch is not "bigger models." The pitch is clearer boundaries:
+              local artifacts, explicit runtime assembly, and dry-run validation
+              before you spend time on real backend setup.
             </p>
           </div>
           <div className={styles.compareGrid}>
@@ -214,8 +214,8 @@ outputs:
             <div className={styles.sectionHeader}>
               <h2>Proof you can inspect today</h2>
               <p>
-                Start with dry-run validation. Move to real model-backed inference only
-                when your local backend and model setup are ready.
+                Start with dry-run validation. Move to real model-backed inference
+                only when your local backend and model setup are ready.
               </p>
             </div>
             <Link className={styles.inlineCta} to="/docs/reference/command-reference">
@@ -236,8 +236,9 @@ outputs:
           <div className={styles.boundaryCopy}>
             <h2>Honest v0.1 boundaries</h2>
             <p>
-              SLMCortex is useful to evaluate because its limits are visible. The current
-              release is a narrow local path, not a broad production-agent platform.
+              SLMCortex is easiest to evaluate because its limits are visible. The
+              current release is a narrow local path, not a broad production-agent
+              platform.
             </p>
           </div>
           <ul>
@@ -251,7 +252,7 @@ outputs:
           <div className={styles.docsHeader}>
             <div className={styles.sectionHeader}>
               <h2>Choose the next technical path</h2>
-              <p>Use the docs to verify the demo, inspect commands, or read the runtime architecture.</p>
+              <p>Use the docs to verify the demo, understand the packaged flow, or inspect the runtime architecture.</p>
             </div>
             <Link className={styles.inlineCta} href={githubUrl}>
               Inspect source

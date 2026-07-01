@@ -2,11 +2,12 @@
 title: SLM Package Contract
 ---
 
-An SLM package is a reusable artifact for a trained LoRA adapter. It preserves
-router semantics, registry semantics, accepted datasets, and checked-in
-benchmark artifacts.
+An SLM package is the reusable artifact format in SLMCortex.
 
-## Required package files
+It wraps a trained LoRA adapter with the metadata needed to validate, route,
+compose, and reproduce it later.
+
+## Required Package Files
 
 - `slm.yaml`
 - `metadata.json`
@@ -14,34 +15,45 @@ benchmark artifacts.
 - `eval.json`
 - adapter weights under `adapter/`
 
-Optional package files include `README.md` and `examples.jsonl`.
+Optional files include `README.md` and `examples.jsonl`.
 
-## Routing metadata
+## Typical Layout
 
-Discovery reads direct child folders under `--slms-dir`. A discoverable package
-only needs `slm.yaml`; `routing_card.json`, `eval_summary.json`,
-`examples.jsonl`, and `adapter/` are optional for discovery.
-
-```yaml
-slm_id: fastapi_contract
-name: FastAPI Contract Slm
-description: FastAPI endpoints with Pydantic validation.
-capabilities:
-  - fastapi
-  - pydantic
-activation_cues:
-  - FastAPI
-  - Pydantic
-avoid_when:
-  - frontend-only task
-task_type_hint: api_generation
-base_model: optional-base-model-id
-adapter_path: adapter
+```text
+slms/python_slm/
+├── adapter/
+│   ├── adapters.safetensors
+│   ├── adapter.gguf
+│   └── adapter_config.json
+├── slm.yaml
+├── README.md
+├── eval.json
+├── training_config.json
+├── metadata.json
+└── examples.jsonl
 ```
 
-## Composition metadata
+A real package uses one adapter weight format, not both:
 
-Self-describing packages use `composition` metadata as the source of truth:
+- MLX packages use `adapter/adapters.safetensors`
+- GGUF packages use `adapter/adapter.gguf`
+
+## What The Metadata Is For
+
+The package contract preserves:
+
+- routing hints
+- compatibility declarations
+- dataset provenance
+- checksums
+- protected input snapshots
+
+That is what lets Composer and Runtime Core treat a package as a trustworthy
+unit instead of a loose folder of weights.
+
+## Minimal Composition Metadata
+
+Self-describing packages can embed composition metadata directly:
 
 ```yaml
 composition:
@@ -63,30 +75,38 @@ Required fields:
 - `composition.activation.default_route_type`
 - `composition.activation.scope`
 
-## Validation rules
+## Validation Rules
 
-- Required package files and adapter weights must exist.
-- `metadata.json` must record deterministic per-file checksums.
-- Protected input snapshots must be recorded and unchanged.
-- If `composition` metadata is present, `slm.yaml` and `metadata.json` must match.
-- Validation rechecks package checksums and protected input hashes when source files still exist.
+- required files must exist
+- `metadata.json` must record deterministic per-file checksums
+- protected inputs must be recorded and unchanged
+- if `composition` metadata exists, `slm.yaml` and `metadata.json` must agree
 
-Protected inputs include train/eval datasets, base/training configs, registry
-configs, SLM configs, adapter artifacts, and benchmark files.
+## Related Commands
 
-## Runtime bundle contract
+Create a package:
 
-`compose-slms` writes:
-
-```text
-composition.yaml
-router_config.json
-active_slms.json
-compatibility_report.json
-budget_report.json
-checksums.json
-README.md
+```bash
+slmcortex package-slm \
+  --slm-id python_slm \
+  --name "Python Slm" \
+  --adapter-dir artifacts/adapters/python_slm \
+  --train-dataset data/train.jsonl \
+  --eval-dataset data/eval.jsonl \
+  --eval-summary tests/fixtures/slmcortex_demo/eval-summary.json \
+  --output slms/python_slm
 ```
 
-The bundle is the Runtime Core startup artifact. Runtime Core does not require
-registry state at startup or inference time.
+Validate it:
+
+```bash
+slmcortex validate-slm-package --path slms/python_slm
+```
+
+Compose it:
+
+```bash
+slmcortex compose-slms \
+  --slms slms/python_slm,slms/debugging_slm \
+  --output runtime/debugging_bundle
+```

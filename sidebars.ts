@@ -8,18 +8,10 @@ const sidebars: SidebarsConfig = {
       label: 'Getting Started',
       items: [
         'getting-started/quickstart',
+        'getting-started/packaged-install',
         'getting-started/install-and-backends',
         'getting-started/no-model-demo',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Concepts',
-      items: [
-        'concepts/slm-packages',
-        'concepts/runtime-bundles',
-        'concepts/routing-and-validation',
-        'concepts/bounded-agent-workflow',
+        'getting-started/local-coding-agent-setup',
       ],
     },
     {
@@ -44,7 +36,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Releases',
-      items: ['releases/v0.1.0'],
+      items: ['releases/v0.1.1', 'releases/v0.1.0'],
     },
   ],
 };

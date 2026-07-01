@@ -2,33 +2,33 @@
 title: Repo Boundary Map
 ---
 
-SLMCortex is the canonical public product surface for the source repository.
+This page answers one simple question:
 
-## Canonical boundaries
+Where is the public product surface, and where are the supporting internals?
 
-- `src/`: public product CLI, package/runtime tooling, and bounded agent surface
+## Canonical Boundaries
+
+- `src/`: public CLI, package/runtime tooling, and bounded agent surface
 - `configs/`: runtime defaults and governed SLM registry inputs
 - `data/`: canonical datasets and benchmarks
 - `slms/`: SLM catalog mirror and package artifacts
 - `examples/`: runnable examples and smoke snippets
-- `docs/`: specs, architecture notes, and user-facing documentation
-- `scripts/`: validation, demo, and governance helpers
+- `docs/`: user-facing docs, specs, and architecture notes
+- `scripts/`: demo, validation, and governance helpers
 - `tests/`: unit, integration, and regression coverage
-- `artifacts/`: immutable adapters, validation fixtures, and generated governance outputs
+- `artifacts/`: immutable adapters, fixtures, and generated governance outputs
 
-## Stability policy
+## Stability Policy
 
-- Do not change model behavior, adapters, registry semantics, or benchmark data.
-- Keep `slmcortex` as the canonical public identity.
-- Keep generated artifacts immutable.
-- Keep public documentation product-first.
+- keep `slmcortex` as the canonical public identity
+- keep generated artifacts immutable
+- keep public docs product-first
+- do not casually change adapter semantics, registry semantics, or benchmark data
 
-## Current source of truth
+## Source Of Truth
 
-- Public CLI entry point: `slmcortex`
-- Product runtime/package implementation: `src/`
-- SLM registry: `configs/slm_registry.json`
-- SLM metadata: `configs/slms.yaml`
+- public CLI entry point: `slmcortex`
+- runtime and package implementation: `src/`
+- SLM registry: `src/slmcortex_resources/configs/slm_registry.json`
+- SLM metadata: `src/slmcortex_resources/configs/slms.yaml`
 - SLM mirror: `slms/slm_registry.json`, `slms/slms.yaml`
-- Datasets and benchmarks: `data/`
-- Checked-in adapters and validation fixtures: `artifacts/`
